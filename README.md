@@ -21,8 +21,8 @@ The following REQUIRED features are completed:
 The following STRETCH features are implemented:
 
 - [x] Add a UI element for the user to interact with API further (Material 3 DatePicker Calendar)
-- [x] Show a `Toast` or `Snackbar` when an item is clicked
-- [x] Add item dividers with `DividerItemDecoration`
+- [ ] Show a `Toast` or `Snackbar` when an item is clicked
+- [ ] Add item dividers with `DividerItemDecoration`
 
 The following EXTRA features are implemented:
 
