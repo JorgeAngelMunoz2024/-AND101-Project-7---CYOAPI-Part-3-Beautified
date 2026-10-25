@@ -1,5 +1,6 @@
 package com.example.moonday.ui
 
+import com.example.moonday.data.model.MoonMonthResponse
 import com.example.moonday.data.model.MoonPhaseResponse
 import com.example.moonday.data.model.MoonVisualInfo
 import com.example.moonday.data.model.PhaseInfo
@@ -12,6 +13,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -33,6 +35,20 @@ class MoonViewModelTest {
                         timestamp = date ?: "2026-04-15",
                         phase = PhaseInfo(name = "Waning Gibbous", illumination = 0.85),
                         moonVisual = MoonVisualInfo(svg = "<svg>moon</svg>")
+                    )
+                )
+            }
+        }
+
+        override suspend fun getMoonMonth(year: Int, month: Int): Result<MoonMonthResponse> {
+            return if (shouldFail) {
+                Result.failure(Exception("Network error"))
+            } else {
+                Result.success(
+                    MoonMonthResponse(
+                        year = year,
+                        month = month,
+                        days = emptyList()
                     )
                 )
             }
@@ -79,7 +95,7 @@ class MoonViewModelTest {
     }
 
     @Test
-    fun `fetchMoonPhase updates uiState to Error when repository fails`() = runTest {
+    fun `fetchMoonPhase gracefully falls back to local calculation when repository fails`() = runTest {
         val repository = FakeMoonRepository(shouldFail = true)
         val viewModel = MoonViewModel(repository)
 
@@ -87,8 +103,10 @@ class MoonViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
 
         val state = viewModel.uiState.value
-        assertTrue(state is MoonUiState.Error)
-        val errorState = state as MoonUiState.Error
-        assertEquals("Network error", errorState.message)
+        assertTrue(state is MoonUiState.Success)
+        val successState = state as MoonUiState.Success
+        assertEquals("2026-04-15", successState.response.timestamp)
+        assertNotNull(successState.response.phase?.name)
+        assertNotNull(successState.response.moonVisual?.svg)
     }
 }

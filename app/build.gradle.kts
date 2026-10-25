@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.material)
 
     // Networking
+    implementation(libs.async.http)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp.logging)

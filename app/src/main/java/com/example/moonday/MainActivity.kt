@@ -67,6 +67,7 @@ fun MoonDayApp(viewModel: MoonViewModel) {
     var lastSelectedDay by remember { mutableStateOf(15) }
 
     val uiState by viewModel.uiState.collectAsState()
+    val weekDays by viewModel.weekDays.collectAsState()
 
     when (currentScreen) {
         AppScreen.HOME -> {
@@ -95,6 +96,10 @@ fun MoonDayApp(viewModel: MoonViewModel) {
         AppScreen.DETAILS -> {
             MoonDetailsScreen(
                 uiState = uiState,
+                weekDays = weekDays,
+                onDayItemClick = { item ->
+                    viewModel.selectDay(item)
+                },
                 onBackClick = {
                     currentScreen = AppScreen.CALENDAR
                 },

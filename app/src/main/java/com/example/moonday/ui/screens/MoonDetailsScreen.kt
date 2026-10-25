@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -30,9 +32,11 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,10 +47,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.moonday.BubblyFontFamily
+import com.example.moonday.data.model.InterpretationInfo
+import com.example.moonday.data.model.MoonDayItem
 import com.example.moonday.data.model.MoonPhaseResponse
 import com.example.moonday.ui.MoonUiState
 import com.example.moonday.ui.components.MoonSvgView
+import com.example.moonday.ui.components.MoonWeekRecyclerView
 import com.example.moonday.ui.components.StarryHeader
+import kotlinx.coroutines.launch
 
 enum class DetailsTab(val title: String, val icon: ImageVector) {
     PHASE("Phase", Icons.Default.Nightlight),
@@ -58,6 +66,8 @@ enum class DetailsTab(val title: String, val icon: ImageVector) {
 @Composable
 fun MoonDetailsScreen(
     uiState: MoonUiState,
+    weekDays: List<MoonDayItem>,
+    onDayItemClick: (MoonDayItem) -> Unit,
     onBackClick: () -> Unit,
     onSelectAnotherDateClick: () -> Unit,
     onRetryClick: () -> Unit,
@@ -183,52 +193,141 @@ fun MoonDetailsScreen(
                 }
 
                 is MoonUiState.Success -> {
-                    val data = uiState.response
+                    val currentData = uiState.response
+                    val selectedDateStr = currentData.timestamp?.take(10)
+
+                    val virtualPageCount = if (weekDays.isNotEmpty()) 1000 * weekDays.size else 1
+                    val initialSelectedIdx = remember(weekDays) {
+                        val idx = weekDays.indexOfFirst { it.calendarDate == selectedDateStr }
+                        if (idx >= 0) idx else 0
+                    }
+                    val initialPage = if (weekDays.isNotEmpty()) (500 * weekDays.size) + initialSelectedIdx else 0
+
+                    val pagerState = rememberPagerState(
+                        initialPage = initialPage,
+                        pageCount = { virtualPageCount }
+                    )
+                    val coroutineScope = rememberCoroutineScope()
+
+                    // Sync Pager Page Swipe -> Day Highlight Selection with Loop Support
+                    LaunchedEffect(pagerState.currentPage) {
+                        if (weekDays.isNotEmpty()) {
+                            val actualIdx = pagerState.currentPage % weekDays.size
+                            val targetItem = weekDays[actualIdx]
+                            if (targetItem.calendarDate != selectedDateStr) {
+                                onDayItemClick(targetItem)
+                            }
+                        }
+                    }
+
+                    // Sync Top RecyclerView Tap -> Pager Smooth Scroll with Loop Math
+                    LaunchedEffect(selectedDateStr) {
+                        if (selectedDateStr != null && weekDays.isNotEmpty()) {
+                            val targetIdx = weekDays.indexOfFirst { it.calendarDate == selectedDateStr }
+                            if (targetIdx >= 0) {
+                                val currentP = pagerState.currentPage
+                                val currentIdx = currentP % weekDays.size
+                                val diff = targetIdx - currentIdx
+                                val targetPage = currentP + diff
+                                if (targetPage != currentP) {
+                                    pagerState.animateScrollToPage(targetPage)
+                                }
+                            }
+                        }
+                    }
+
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState()),
+                        modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        data.timestamp?.let { ts ->
+                        DataDisplayDate(selectedDateStr ?: currentData.timestamp)
+
+                        // Top Weekly Horizontal RecyclerView
+                        if (weekDays.isNotEmpty()) {
                             Text(
-                                text = "Date: $ts",
-                                fontSize = 18.sp,
-                                fontFamily = BubblyFontFamily,
-                                color = Color(0xFFA0A5C0),
-                                modifier = Modifier.padding(vertical = 8.dp)
-                            )
-                        }
-
-                        when (currentTab) {
-                            DetailsTab.PHASE -> PhaseTabContent(data)
-                            DetailsTab.ASTRONOMY -> AstronomyTabContent(data)
-                            DetailsTab.GUIDANCE -> GuidanceTabContent(data)
-                            DetailsTab.FORECAST -> ForecastTabContent(data)
-                        }
-
-                        Spacer(modifier = Modifier.height(20.dp))
-
-                        Button(
-                            onClick = onSelectAnotherDateClick,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(64.dp),
-                            shape = RoundedCornerShape(20.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF6C5CE7),
-                                contentColor = Color.White
-                            )
-                        ) {
-                            Text(
-                                text = "Select Another Date",
+                                text = "Weekly Moon Phases",
                                 fontSize = 22.sp,
                                 fontWeight = FontWeight.Bold,
-                                fontFamily = BubblyFontFamily
+                                fontFamily = BubblyFontFamily,
+                                color = Color.White,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 4.dp, bottom = 8.dp)
+                            )
+
+                            MoonWeekRecyclerView(
+                                weekDays = weekDays,
+                                selectedDate = selectedDateStr,
+                                onDayClick = { item ->
+                                    val targetIdx = weekDays.indexOf(item)
+                                    if (targetIdx >= 0) {
+                                        val currentP = pagerState.currentPage
+                                        val currentIdx = currentP % weekDays.size
+                                        val diff = targetIdx - currentIdx
+                                        val targetPage = currentP + diff
+                                        coroutineScope.launch {
+                                            pagerState.animateScrollToPage(targetPage)
+                                        }
+                                    }
+                                    onDayItemClick(item)
+                                },
+                                height = 195.dp,
+                                modifier = Modifier.padding(bottom = 12.dp)
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        // Horizontal Pager for Looping Sliding Moon Cards
+                        HorizontalPager(
+                            state = pagerState,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                        ) { page ->
+                            val actualPage = if (weekDays.isNotEmpty()) page % weekDays.size else 0
+                            val pageItem = if (weekDays.isNotEmpty()) weekDays[actualPage] else null
+                            val pageData = if (pageItem?.calendarDate == selectedDateStr) {
+                                currentData
+                            } else {
+                                buildPhaseResponseForDayItem(pageItem, currentData)
+                            }
+
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .verticalScroll(rememberScrollState()),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                when (currentTab) {
+                                    DetailsTab.PHASE -> PhaseTabContent(pageData)
+                                    DetailsTab.ASTRONOMY -> AstronomyTabContent(pageData)
+                                    DetailsTab.GUIDANCE -> GuidanceTabContent(pageData)
+                                    DetailsTab.FORECAST -> ForecastTabContent(pageData)
+                                }
+
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                Button(
+                                    onClick = onSelectAnotherDateClick,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(60.dp),
+                                    shape = RoundedCornerShape(20.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(0xFF6C5CE7),
+                                        contentColor = Color.White
+                                    )
+                                ) {
+                                    Text(
+                                        text = "Select Another Date",
+                                        fontSize = 22.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        fontFamily = BubblyFontFamily
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(20.dp))
+                            }
+                        }
                     }
                 }
 
@@ -236,6 +335,44 @@ fun MoonDetailsScreen(
             }
         }
     }
+}
+
+@Composable
+private fun DataDisplayDate(timestamp: String?) {
+    timestamp?.let { ts ->
+        Text(
+            text = "Date: $ts",
+            fontSize = 18.sp,
+            fontFamily = BubblyFontFamily,
+            color = Color(0xFFA0A5C0),
+            modifier = Modifier.padding(vertical = 4.dp)
+        )
+    }
+}
+
+private fun buildPhaseResponseForDayItem(item: MoonDayItem?, fallback: MoonPhaseResponse): MoonPhaseResponse {
+    if (item == null) return fallback
+    val dateStr = item.calendarDate ?: item.timestamp ?: fallback.timestamp
+    val phaseName = item.phase?.name ?: fallback.phase?.name ?: "Moon Phase"
+    val illumPercent = item.phase?.illumination?.let { (it * 100).toInt() } ?: 50
+
+    val generatedInterpretation = InterpretationInfo(
+        title = "$phaseName Insights",
+        body = "$phaseName is $illumPercent% illuminated today. The moon is in ${item.zodiac?.sign ?: "the sky"}${item.phase?.ageDays?.let { " at an age of $it days" } ?: ""}. This is an optimal period for lunar tracking and astrological alignment.",
+        tone = "mystical",
+        tags = listOf("lunar", "astronomy")
+    )
+
+    return MoonPhaseResponse(
+        timestamp = dateStr,
+        phase = item.phase ?: fallback.phase,
+        zodiac = item.zodiac ?: fallback.zodiac,
+        moonVisual = item.moonVisual ?: fallback.moonVisual,
+        traditionalMoon = item.traditionalMoon ?: fallback.traditionalMoon,
+        interpretation = fallback.interpretation ?: generatedInterpretation,
+        nextPhases = fallback.nextPhases,
+        specialMoon = fallback.specialMoon
+    )
 }
 
 @Composable

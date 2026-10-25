@@ -25,7 +25,7 @@ fun MoonSvgView(
     val imageRequest = ImageRequest.Builder(context)
         .data(svgContent.toByteArray(Charsets.UTF_8))
         .decoderFactory(SvgDecoder.Factory())
-        .crossfade(true)
+        .crossfade(false)
         .build()
 
     Box(
