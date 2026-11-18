@@ -1,3 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App Information -->
     <string name="app_name">MoonDay</string>
+    <string name="home_tagline">Discover the moon phase, astrological insights, and lunar visuals for any day of the year.</string>
+    <string name="home_enter_date_button">Enter a Date</string>
+
+    <!-- Calendar Select Screen -->
+    <string name="calendar_header_title">Pick a Date</string>
+    <string name="calendar_subtitle">Select any day in the year to query FreeAstroAPI.</string>
+    <string name="calendar_selected_date_label">Selected Date: %1$s</string>
+    <string name="calendar_fetch_button">Fetch Moon Phase</string>
+
+    <!-- Moon Details Screen -->
+    <string name="details_header_title">Moon Details</string>
+    <string name="details_weekly_title">Weekly Moon Phases</string>
+    <string name="details_date_label">Date: %1$s</string>
+    <string name="details_loading_text">Querying FreeAstroAPI...</string>
+    <string name="details_error_title">Unable to load data</string>
+    <string name="details_retry_button">Retry</string>
+    <string name="details_select_another_date_button">Select Another Date</string>
+
+    <!-- Navigation Tabs -->
+    <string name="tab_phase">Phase</string>
+    <string name="tab_astronomy">Astronomy</string>
+    <string name="tab_guidance">Guidance</string>
+    <string name="tab_forecast">Forecast</string>
+
+    <!-- Phase Details -->
+    <string name="phase_default_name">Moon Phase</string>
+    <string name="phase_illumination_format">%1$d%% Illuminated</string>
+    <string name="phase_traditional_name_format">Traditional Name: %1$s</string>
+    <string name="phase_special_features_format">Special Features: %1$s</string>
+
+    <!-- Astronomy Tab -->
+    <string name="astronomy_title">Astronomical &amp; Zodiac Details</string>
+    <string name="astronomy_moon_age">Moon Age</string>
+    <string name="astronomy_moon_age_format">%1$s days</string>
+    <string name="astronomy_distance">Distance</string>
+    <string name="astronomy_distance_format">%1$s km</string>
+    <string name="astronomy_phase_angle">Phase Angle</string>
+    <string name="astronomy_phase_angle_format">%1$s°</string>
+    <string name="astronomy_waxing_waning">Waxing/Waning</string>
+    <string name="astronomy_waxing">Waxing</string>
+    <string name="astronomy_waning">Waning</string>
+    <string name="astronomy_tropical_zodiac">Tropical Zodiac</string>
+    <string name="astronomy_zodiac_format">%1$s (%2$s°)</string>
+
+    <!-- Guidance Tab -->
+    <string name="guidance_default_title">Astrological Guidance</string>
+    <string name="guidance_no_data">No guidance text available for this date.</string>
+
+    <!-- Forecast Tab -->
+    <string name="forecast_title">Upcoming Lunar Phases</string>
+    <string name="forecast_next_new_moon">Next New Moon</string>
+    <string name="forecast_first_quarter">First Quarter</string>
+    <string name="forecast_next_full_moon">Next Full Moon</string>
+    <string name="forecast_last_quarter">Last Quarter</string>
+    <string name="forecast_no_data">No forecast data available for this date.</string>
+
+    <!-- Theme Toggle -->
+    <string name="theme_toggle_day">Day Mode</string>
+    <string name="theme_toggle_night">Night Mode</string>
+    <string name="content_desc_theme_toggle">Toggle Day / Night Theme</string>
+
+    <!-- Content Descriptions &amp; Accessibility -->
+    <string name="content_desc_back">Back</string>
+    <string name="content_desc_sparkle">Sparkle Icon</string>
+    <string name="content_desc_moon_icon">Moon Icon</string>
+    <string name="content_desc_calendar_icon">Calendar Icon</string>
 </resources>

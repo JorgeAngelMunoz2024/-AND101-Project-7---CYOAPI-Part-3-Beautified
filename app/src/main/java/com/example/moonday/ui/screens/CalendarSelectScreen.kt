@@ -3,10 +3,14 @@ package com.example.moonday.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -15,17 +19,22 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.moonday.BubblyFontFamily
+import com.example.moonday.R
 import com.example.moonday.ui.components.StarryHeader
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -38,6 +47,8 @@ import java.util.TimeZone
 fun CalendarSelectScreen(
     onDateConfirmed: (year: Int, month: Int, day: Int) -> Unit,
     onBackClick: () -> Unit,
+    onThemeToggle: () -> Unit,
+    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
     val datePickerState = rememberDatePickerState(
@@ -50,7 +61,7 @@ fun CalendarSelectScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFF0D0E15)),
+            .background(MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
@@ -59,51 +70,59 @@ fun CalendarSelectScreen(
             modifier = Modifier.weight(1f)
         ) {
             StarryHeader(
-                title = "Pick a Date",
-                onBackClick = onBackClick
+                title = stringResource(R.string.calendar_header_title),
+                onBackClick = onBackClick,
+                onThemeToggle = onThemeToggle,
+                isDarkTheme = isDarkTheme
             )
 
             Text(
-                text = "Select any day in the year to query FreeAstroAPI.",
+                text = stringResource(R.string.calendar_subtitle),
+                style = MaterialTheme.typography.bodyLarge,
                 fontSize = 18.sp,
                 fontFamily = BubblyFontFamily,
-                color = Color(0xFFA0A5C0),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
             )
 
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF171822)),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 shape = RoundedCornerShape(20.dp),
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
             ) {
                 DatePicker(
                     state = datePickerState,
                     colors = DatePickerDefaults.colors(
-                        containerColor = Color(0xFF171822),
-                        titleContentColor = Color.White,
-                        headlineContentColor = Color.White,
-                        weekdayContentColor = Color(0xFFA0A5C0),
-                        dayContentColor = Color.White,
-                        selectedDayContainerColor = Color(0xFF6C5CE7),
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        headlineContentColor = MaterialTheme.colorScheme.onSurface,
+                        weekdayContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        dayContentColor = MaterialTheme.colorScheme.onSurface,
+                        selectedDayContainerColor = MaterialTheme.colorScheme.primary,
                         selectedDayContentColor = Color.White,
-                        todayDateBorderColor = Color(0xFF6C5CE7),
-                        todayContentColor = Color(0xFF6C5CE7)
+                        todayDateBorderColor = MaterialTheme.colorScheme.primary,
+                        todayContentColor = MaterialTheme.colorScheme.primary
                     )
                 )
             }
         }
 
         Column(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Selected Date: $formattedDisplayDate",
+                text = stringResource(R.string.calendar_selected_date_label, formattedDisplayDate),
+                style = MaterialTheme.typography.titleMedium,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = BubblyFontFamily,
-                color = Color(0xFFE0E0E0),
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
@@ -117,16 +136,29 @@ fun CalendarSelectScreen(
                     .height(70.dp),
                 shape = RoundedCornerShape(20.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF6C5CE7),
+                    containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = Color.White
                 )
             ) {
-                Text(
-                    text = "Fetch Moon Phase",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = BubblyFontFamily
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_moon_star),
+                        contentDescription = stringResource(R.string.content_desc_moon_icon),
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(28.dp)
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        text = stringResource(R.string.calendar_fetch_button),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = BubblyFontFamily
+                    )
+                }
             }
         }
     }

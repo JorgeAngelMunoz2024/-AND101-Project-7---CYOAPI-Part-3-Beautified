@@ -3,6 +3,7 @@ package com.example.moonday.ui.components
 import android.annotation.SuppressLint
 import android.view.View
 import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
@@ -15,14 +16,24 @@ import androidx.compose.ui.viewinterop.AndroidView
 @Composable
 fun AnimationWebView(
     modifier: Modifier = Modifier,
+    isDarkTheme: Boolean = true,
     assetPath: String = "file:///android_asset/moon-phases/app_opening.html",
     height: Dp = 260.dp
 ) {
+    val themeMode = if (isDarkTheme) "dark" else "light"
+
     AndroidView(
         factory = { context ->
             WebView(context).apply {
                 setBackgroundColor(0x00000000)
                 setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+                webViewClient = object : WebViewClient() {
+                    override fun onPageFinished(view: WebView?, url: String?) {
+                        super.onPageFinished(view, url)
+                        val script = "if (typeof setTheme === 'function') { setTheme('$themeMode'); } else if ('$themeMode' === 'light') { document.body.classList.add('light-theme'); } else { document.body.classList.remove('light-theme'); }"
+                        view?.evaluateJavascript(script, null)
+                    }
+                }
                 settings.apply {
                     javaScriptEnabled = true
                     allowFileAccess = true
@@ -38,7 +49,12 @@ fun AnimationWebView(
             }
         },
         update = { webView ->
-            webView.loadUrl(assetPath)
+            if (webView.url.isNullOrEmpty()) {
+                webView.loadUrl(assetPath)
+            } else {
+                val script = "if ('$themeMode' === 'light') { document.body.classList.add('light-theme'); } else { document.body.classList.remove('light-theme'); }"
+                webView.evaluateJavascript(script, null)
+            }
         },
         modifier = modifier
             .fillMaxWidth()

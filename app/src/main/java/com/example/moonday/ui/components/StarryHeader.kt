@@ -10,8 +10,11 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -21,17 +24,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.moonday.BubblyFontFamily
+import com.example.moonday.R
 import kotlin.random.Random
 
 @Composable
 fun StarryHeader(
     title: String,
     onBackClick: (() -> Unit)? = null,
+    onThemeToggle: (() -> Unit)? = null,
+    isDarkTheme: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     val stars = remember {
@@ -45,26 +52,34 @@ fun StarryHeader(
         }
     }
 
+    val headerGradient = if (isDarkTheme) {
+        listOf(
+            Color(0xFF2C1E62),
+            Color(0xFF131428),
+            Color(0xFF0D0E15)
+        )
+    } else {
+        listOf(
+            Color(0xFF6C5CE7),
+            Color(0xFF818CF8),
+            Color(0xFFC7D2FE)
+        )
+    }
+
+    val starColor = if (isDarkTheme) Color.White else Color(0xFF4C1D95)
+
     Box(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF2C1E62),
-                        Color(0xFF131428),
-                        Color(0xFF0D0E15)
-                    )
-                )
-            )
+            .background(Brush.verticalGradient(colors = headerGradient))
             .statusBarsPadding()
             .padding(horizontal = 8.dp, vertical = 14.dp)
     ) {
         Canvas(modifier = Modifier.matchParentSize()) {
             stars.forEach { (xPct, yPct, radius) ->
                 drawCircle(
-                    color = Color.White.copy(alpha = (0.3f + (xPct * 0.7f)).coerceIn(0.25f, 0.95f)),
+                    color = starColor.copy(alpha = (0.3f + (xPct * 0.6f)).coerceIn(0.2f, 0.85f)),
                     radius = radius.dp.toPx(),
                     center = Offset(
                         x = size.width * xPct,
@@ -85,7 +100,7 @@ fun StarryHeader(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
+                        contentDescription = stringResource(R.string.content_desc_back),
                         tint = Color.White
                     )
                 }
@@ -95,15 +110,29 @@ fun StarryHeader(
 
             Text(
                 text = title,
-                fontSize = 36.sp,
+                style = MaterialTheme.typography.titleLarge,
+                fontSize = 32.sp,
                 fontWeight = FontWeight.ExtraBold,
                 fontFamily = BubblyFontFamily,
                 color = Color.White,
                 textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(end = if (onBackClick != null) 48.dp else 0.dp)
+                modifier = Modifier.weight(1f)
             )
+
+            if (onThemeToggle != null) {
+                IconButton(
+                    onClick = onThemeToggle,
+                    modifier = Modifier.padding(end = 4.dp)
+                ) {
+                    Icon(
+                        imageVector = if (isDarkTheme) Icons.Default.LightMode else Icons.Default.DarkMode,
+                        contentDescription = stringResource(R.string.content_desc_theme_toggle),
+                        tint = if (isDarkTheme) Color(0xFFFDCB6E) else Color(0xFF1E1B4B)
+                    )
+                }
+            } else {
+                Box(modifier = Modifier.padding(end = 48.dp))
+            }
         }
     }
 }

@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.PathParser
 import androidx.compose.ui.unit.Dp
@@ -40,9 +41,12 @@ private val MOON_PATHS = listOf(
 @Composable
 fun MoonAnimationView(
     modifier: Modifier = Modifier,
+    isDarkTheme: Boolean = true,
     size: Dp = 200.dp
 ) {
     var currentFrameIndex by remember { mutableIntStateOf(0) }
+    val moonColor = if (isDarkTheme) Color.White else Color(0xFF6C5CE7)
+    val glowColor = if (isDarkTheme) Color(0xFFFDCB6E).copy(alpha = 0.25f) else Color(0xFF6C5CE7).copy(alpha = 0.15f)
 
     LaunchedEffect(Unit) {
         while (true) {
@@ -71,9 +75,18 @@ fun MoonAnimationView(
 
                 drawContext.canvas.save()
                 drawContext.canvas.scale(scaleX, scaleY)
+
+                // Soft background glow circle centered behind moon
+                drawCircle(
+                    color = glowColor,
+                    radius = 95f,
+                    center = Offset(110f, 110f)
+                )
+
+                // Moon phase path
                 drawPath(
                     path = parsedPath,
-                    color = Color.White
+                    color = moonColor
                 )
                 drawContext.canvas.restore()
             }

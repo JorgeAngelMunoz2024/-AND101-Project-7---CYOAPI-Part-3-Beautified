@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand Colors -->
+    <color name="cosmic_primary">#6C5CE7</color>
+    <color name="cosmic_primary_dark">#4834D4</color>
+    <color name="cosmic_secondary">#74B9FF</color>
+
+    <!-- Dark Theme Mode Adaptive Colors -->
+    <color name="cosmic_background">#0D0E15</color>
+    <color name="cosmic_surface">#171822</color>
+    <color name="cosmic_surface_selected">#252638</color>
+    <color name="cosmic_card_border">#6C5CE7</color>
+    <color name="cosmic_divider">#2A2B3D</color>
+
+    <!-- Text Colors (Dark Mode) -->
+    <color name="cosmic_text_primary">#FFFFFF</color>
+    <color name="cosmic_text_secondary">#A0A5C0</color>
+    <color name="cosmic_text_muted">#717593</color>
+
+    <!-- Accents & Special Features -->
+    <color name="cosmic_gold">#FDCB6E</color>
+    <color name="cosmic_blue_accent">#74B9FF</color>
+    <color name="cosmic_error">#FF7675</color>
+
+    <!-- Header Gradient -->
+    <color name="cosmic_header_start">#2C1E62</color>
+    <color name="cosmic_header_mid">#131428</color>
+    <color name="cosmic_header_end">#0D0E15</color>
+</resources>

@@ -20,6 +20,7 @@ fun MoonWeekRecyclerView(
     onDayClick: (MoonDayItem) -> Unit,
     modifier: Modifier = Modifier,
     selectedDate: String? = null,
+    isDarkTheme: Boolean = true,
     height: Dp = 195.dp
 ) {
     if (weekDays.isEmpty()) return
@@ -65,7 +66,7 @@ fun MoonWeekRecyclerView(
         },
         update = { recyclerView ->
             val adapter = recyclerView.adapter as? MoonWeekRecyclerViewAdapter
-            adapter?.updateDays(weekDays, selectedDate)
+            adapter?.updateDays(weekDays, selectedDate, isDarkTheme)
 
             if (selectedDate != null) {
                 val targetIndex = weekDays.indexOfFirst { it.calendarDate == selectedDate }

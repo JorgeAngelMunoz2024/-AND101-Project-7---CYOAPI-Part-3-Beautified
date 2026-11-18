@@ -1,5 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Brand Colors -->
+    <color name="cosmic_primary">#6C5CE7</color>
+    <color name="cosmic_primary_dark">#4834D4</color>
+    <color name="cosmic_secondary">#0284C7</color>
+
+    <!-- Light Theme Mode Adaptive Colors -->
+    <color name="cosmic_background">#F4F5FB</color>
+    <color name="cosmic_surface">#FFFFFF</color>
+    <color name="cosmic_surface_selected">#EDE7F6</color>
+    <color name="cosmic_card_border">#6C5CE7</color>
+    <color name="cosmic_divider">#E2E8F0</color>
+
+    <!-- Text Colors (Light Mode) -->
+    <color name="cosmic_text_primary">#1A1B2F</color>
+    <color name="cosmic_text_secondary">#5A607F</color>
+    <color name="cosmic_text_muted">#8A90B4</color>
+
+    <!-- Accents & Special Features -->
+    <color name="cosmic_gold">#D97706</color>
+    <color name="cosmic_blue_accent">#0284C7</color>
+    <color name="cosmic_error">#E11D48</color>
+
+    <!-- Header Gradient -->
+    <color name="cosmic_header_start">#4C1D95</color>
+    <color name="cosmic_header_mid">#312E81</color>
+    <color name="cosmic_header_end">#1E1B4B</color>
+
+    <!-- Standard Palette -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>

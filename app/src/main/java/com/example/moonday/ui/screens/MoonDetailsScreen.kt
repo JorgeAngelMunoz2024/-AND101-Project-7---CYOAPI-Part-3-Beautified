@@ -1,5 +1,6 @@
 package com.example.moonday.ui.screens
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +27,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -42,11 +44,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.moonday.BubblyFontFamily
+import com.example.moonday.R
 import com.example.moonday.data.model.InterpretationInfo
 import com.example.moonday.data.model.MoonDayItem
 import com.example.moonday.data.model.MoonPhaseResponse
@@ -56,11 +60,11 @@ import com.example.moonday.ui.components.MoonWeekRecyclerView
 import com.example.moonday.ui.components.StarryHeader
 import kotlinx.coroutines.launch
 
-enum class DetailsTab(val title: String, val icon: ImageVector) {
-    PHASE("Phase", Icons.Default.Nightlight),
-    ASTRONOMY("Astronomy", Icons.Default.Public),
-    GUIDANCE("Guidance", Icons.Default.AutoAwesome),
-    FORECAST("Forecast", Icons.Default.DateRange)
+enum class DetailsTab(@param:StringRes val titleRes: Int, val icon: ImageVector) {
+    PHASE(R.string.tab_phase, Icons.Default.Nightlight),
+    ASTRONOMY(R.string.tab_astronomy, Icons.Default.Public),
+    GUIDANCE(R.string.tab_guidance, Icons.Default.AutoAwesome),
+    FORECAST(R.string.tab_forecast, Icons.Default.DateRange)
 }
 
 @Composable
@@ -71,6 +75,8 @@ fun MoonDetailsScreen(
     onBackClick: () -> Unit,
     onSelectAnotherDateClick: () -> Unit,
     onRetryClick: () -> Unit,
+    onThemeToggle: () -> Unit,
+    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
     var selectedTabOrdinal by remember { mutableIntStateOf(DetailsTab.PHASE.ordinal) }
@@ -78,38 +84,41 @@ fun MoonDetailsScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        containerColor = Color(0xFF0D0E15),
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             StarryHeader(
-                title = "Moon Details",
-                onBackClick = onBackClick
+                title = stringResource(R.string.details_header_title),
+                onBackClick = onBackClick,
+                onThemeToggle = onThemeToggle,
+                isDarkTheme = isDarkTheme
             )
         },
         bottomBar = {
             if (uiState is MoonUiState.Success) {
                 NavigationBar(
-                    containerColor = Color(0xFF171822),
+                    containerColor = MaterialTheme.colorScheme.surface,
                     tonalElevation = 8.dp
                 ) {
                     DetailsTab.entries.forEach { tab ->
+                        val tabTitle = stringResource(tab.titleRes)
                         NavigationBarItem(
                             selected = currentTab == tab,
                             onClick = { selectedTabOrdinal = tab.ordinal },
-                            icon = { Icon(tab.icon, contentDescription = tab.title) },
+                            icon = { Icon(tab.icon, contentDescription = tabTitle) },
                             label = {
                                 Text(
-                                    text = tab.title,
+                                    text = tabTitle,
                                     fontSize = 14.sp,
                                     fontFamily = BubblyFontFamily,
                                     fontWeight = FontWeight.Bold
                                 )
                             },
                             colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = Color.White,
-                                selectedTextColor = Color.White,
-                                indicatorColor = Color(0xFF6C5CE7),
-                                unselectedIconColor = Color(0xFFA0A5C0),
-                                unselectedTextColor = Color(0xFFA0A5C0)
+                                selectedIconColor = MaterialTheme.colorScheme.onSurface,
+                                selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                                indicatorColor = MaterialTheme.colorScheme.primary,
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
                     }
@@ -131,15 +140,16 @@ fun MoonDetailsScreen(
                         verticalArrangement = Arrangement.Center
                     ) {
                         CircularProgressIndicator(
-                            color = Color(0xFF6C5CE7),
+                            color = MaterialTheme.colorScheme.primary,
                             strokeWidth = 5.dp
                         )
                         Spacer(modifier = Modifier.height(20.dp))
                         Text(
-                            text = "Querying FreeAstroAPI...",
+                            text = stringResource(R.string.details_loading_text),
+                            style = MaterialTheme.typography.bodyLarge,
                             fontSize = 20.sp,
                             fontFamily = BubblyFontFamily,
-                            color = Color(0xFFA0A5C0)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -151,37 +161,42 @@ fun MoonDetailsScreen(
                         verticalArrangement = Arrangement.Center
                     ) {
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFF171822)),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                             shape = RoundedCornerShape(20.dp),
-                            modifier = Modifier.fillMaxWidth().padding(16.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
                         ) {
                             Column(
                                 modifier = Modifier.padding(24.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = "Unable to load data",
+                                    text = stringResource(R.string.details_error_title),
+                                    style = MaterialTheme.typography.titleLarge,
                                     fontSize = 24.sp,
                                     fontWeight = FontWeight.Bold,
                                     fontFamily = BubblyFontFamily,
-                                    color = Color(0xFFFF7675)
+                                    color = MaterialTheme.colorScheme.error
                                 )
                                 Spacer(modifier = Modifier.height(10.dp))
                                 Text(
                                     text = uiState.message,
+                                    style = MaterialTheme.typography.bodyLarge,
                                     fontSize = 18.sp,
                                     fontFamily = BubblyFontFamily,
-                                    color = Color(0xFFA0A5C0),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     textAlign = TextAlign.Center
                                 )
                                 Spacer(modifier = Modifier.height(24.dp))
                                 Button(
                                     onClick = onRetryClick,
-                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6C5CE7)),
+                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                                     shape = RoundedCornerShape(16.dp)
                                 ) {
                                     Text(
-                                        text = "Retry",
+                                        text = stringResource(R.string.details_retry_button),
+                                        style = MaterialTheme.typography.labelLarge,
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
                                         fontFamily = BubblyFontFamily
@@ -245,11 +260,12 @@ fun MoonDetailsScreen(
                         // Top Weekly Horizontal RecyclerView
                         if (weekDays.isNotEmpty()) {
                             Text(
-                                text = "Weekly Moon Phases",
+                                text = stringResource(R.string.details_weekly_title),
+                                style = MaterialTheme.typography.titleMedium,
                                 fontSize = 22.sp,
                                 fontWeight = FontWeight.Bold,
                                 fontFamily = BubblyFontFamily,
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onBackground,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(top = 4.dp, bottom = 8.dp)
@@ -258,6 +274,7 @@ fun MoonDetailsScreen(
                             MoonWeekRecyclerView(
                                 weekDays = weekDays,
                                 selectedDate = selectedDateStr,
+                                isDarkTheme = isDarkTheme,
                                 onDayClick = { item ->
                                     val targetIdx = weekDays.indexOf(item)
                                     if (targetIdx >= 0) {
@@ -298,7 +315,7 @@ fun MoonDetailsScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 when (currentTab) {
-                                    DetailsTab.PHASE -> PhaseTabContent(pageData)
+                                    DetailsTab.PHASE -> PhaseTabContent(pageData, isDarkTheme)
                                     DetailsTab.ASTRONOMY -> AstronomyTabContent(pageData)
                                     DetailsTab.GUIDANCE -> GuidanceTabContent(pageData)
                                     DetailsTab.FORECAST -> ForecastTabContent(pageData)
@@ -313,12 +330,13 @@ fun MoonDetailsScreen(
                                         .height(60.dp),
                                     shape = RoundedCornerShape(20.dp),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(0xFF6C5CE7),
+                                        containerColor = MaterialTheme.colorScheme.primary,
                                         contentColor = Color.White
                                     )
                                 ) {
                                     Text(
-                                        text = "Select Another Date",
+                                        text = stringResource(R.string.details_select_another_date_button),
+                                        style = MaterialTheme.typography.labelLarge,
                                         fontSize = 22.sp,
                                         fontWeight = FontWeight.Bold,
                                         fontFamily = BubblyFontFamily
@@ -341,10 +359,11 @@ fun MoonDetailsScreen(
 private fun DataDisplayDate(timestamp: String?) {
     timestamp?.let { ts ->
         Text(
-            text = "Date: $ts",
+            text = stringResource(R.string.details_date_label, ts),
+            style = MaterialTheme.typography.bodyLarge,
             fontSize = 18.sp,
             fontFamily = BubblyFontFamily,
-            color = Color(0xFFA0A5C0),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(vertical = 4.dp)
         )
     }
@@ -353,7 +372,7 @@ private fun DataDisplayDate(timestamp: String?) {
 private fun buildPhaseResponseForDayItem(item: MoonDayItem?, fallback: MoonPhaseResponse): MoonPhaseResponse {
     if (item == null) return fallback
     val dateStr = item.calendarDate ?: item.timestamp ?: fallback.timestamp
-    val phaseName = item.phase?.name ?: fallback.phase?.name ?: "Moon Phase"
+    val phaseName = item.phase?.name ?: "Moon Phase"
     val illumPercent = item.phase?.illumination?.let { (it * 100).toInt() } ?: 50
 
     val generatedInterpretation = InterpretationInfo(
@@ -376,9 +395,9 @@ private fun buildPhaseResponseForDayItem(item: MoonDayItem?, fallback: MoonPhase
 }
 
 @Composable
-private fun PhaseTabContent(data: MoonPhaseResponse) {
+private fun PhaseTabContent(data: MoonPhaseResponse, isDarkTheme: Boolean) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF171822)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(24.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -396,33 +415,36 @@ private fun PhaseTabContent(data: MoonPhaseResponse) {
             }
 
             Text(
-                text = data.phase?.name ?: "Moon Phase",
+                text = data.phase?.name ?: stringResource(R.string.phase_default_name),
+                style = MaterialTheme.typography.titleLarge,
                 fontSize = 36.sp,
                 fontWeight = FontWeight.ExtraBold,
                 fontFamily = BubblyFontFamily,
-                color = Color.White
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             data.phase?.illumination?.let { illum ->
                 val illumPercent = (illum * 100).toInt()
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "$illumPercent% Illuminated",
+                    text = stringResource(R.string.phase_illumination_format, illumPercent),
+                    style = MaterialTheme.typography.titleMedium,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = BubblyFontFamily,
-                    color = Color(0xFF6C5CE7)
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
 
             data.traditionalMoon?.name?.let { traditionalName ->
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "Traditional Name: $traditionalName",
+                    text = stringResource(R.string.phase_traditional_name_format, traditionalName),
+                    style = MaterialTheme.typography.bodyLarge,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = BubblyFontFamily,
-                    color = Color(0xFFFDCB6E)
+                    color = if (isDarkTheme) Color(0xFFFDCB6E) else Color(0xFFD97706)
                 )
             }
 
@@ -430,11 +452,12 @@ private fun PhaseTabContent(data: MoonPhaseResponse) {
                 if (labels.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "Special Features: ${labels.joinToString(", ")}",
+                        text = stringResource(R.string.phase_special_features_format, labels.joinToString(", ")),
+                        style = MaterialTheme.typography.bodyLarge,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = BubblyFontFamily,
-                        color = Color(0xFF74B9FF)
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
@@ -445,33 +468,49 @@ private fun PhaseTabContent(data: MoonPhaseResponse) {
 @Composable
 private fun AstronomyTabContent(data: MoonPhaseResponse) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF171822)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(24.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
             Text(
-                text = "Astronomical & Zodiac Details",
+                text = stringResource(R.string.astronomy_title),
+                style = MaterialTheme.typography.titleLarge,
                 fontSize = 26.sp,
                 fontWeight = FontWeight.ExtraBold,
                 fontFamily = BubblyFontFamily,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
             data.phase?.let { p ->
-                InfoRow("Moon Age", "${p.ageDays ?: "-"} days")
-                InfoRow("Distance", "${p.distanceKm ?: "-"} km")
-                InfoRow("Phase Angle", "${p.phaseAngleDeg ?: "-"}°")
-                InfoRow("Waxing/Waning", if (p.isWaxing == true) "Waxing" else "Waning")
+                InfoRow(
+                    label = stringResource(R.string.astronomy_moon_age),
+                    value = stringResource(R.string.astronomy_moon_age_format, p.ageDays?.toString() ?: "-")
+                )
+                InfoRow(
+                    label = stringResource(R.string.astronomy_distance),
+                    value = stringResource(R.string.astronomy_distance_format, p.distanceKm?.toString() ?: "-")
+                )
+                InfoRow(
+                    label = stringResource(R.string.astronomy_phase_angle),
+                    value = stringResource(R.string.astronomy_phase_angle_format, p.phaseAngleDeg?.toString() ?: "-")
+                )
+                InfoRow(
+                    label = stringResource(R.string.astronomy_waxing_waning),
+                    value = if (p.isWaxing == true) stringResource(R.string.astronomy_waxing) else stringResource(R.string.astronomy_waning)
+                )
             }
 
             data.zodiac?.let { z ->
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = 14.dp),
-                    color = Color(0xFF2A2B3D)
+                    color = MaterialTheme.colorScheme.outline
                 )
-                InfoRow("Tropical Zodiac", "${z.sign ?: "-"} (${z.degree ?: "-"}°)")
+                InfoRow(
+                    label = stringResource(R.string.astronomy_tropical_zodiac),
+                    value = stringResource(R.string.astronomy_zodiac_format, z.sign ?: "-", z.degree?.toString() ?: "-")
+                )
             }
         }
     }
@@ -481,34 +520,37 @@ private fun AstronomyTabContent(data: MoonPhaseResponse) {
 private fun GuidanceTabContent(data: MoonPhaseResponse) {
     data.interpretation?.let { interp ->
         Card(
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF171822)),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             shape = RoundedCornerShape(24.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(modifier = Modifier.padding(24.dp)) {
                 Text(
-                    text = interp.title ?: "Astrological Guidance",
+                    text = interp.title ?: stringResource(R.string.guidance_default_title),
+                    style = MaterialTheme.typography.titleLarge,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.ExtraBold,
                     fontFamily = BubblyFontFamily,
-                    color = Color(0xFF74B9FF),
+                    color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
                 Text(
                     text = interp.body ?: "",
+                    style = MaterialTheme.typography.bodyLarge,
                     fontSize = 18.sp,
                     fontFamily = BubblyFontFamily,
-                    color = Color(0xFFDFE6E9),
+                    color = MaterialTheme.colorScheme.onSurface,
                     lineHeight = 28.sp
                 )
             }
         }
     } ?: run {
         Text(
-            text = "No guidance text available for this date.",
+            text = stringResource(R.string.guidance_no_data),
+            style = MaterialTheme.typography.bodyLarge,
             fontSize = 18.sp,
             fontFamily = BubblyFontFamily,
-            color = Color(0xFFA0A5C0),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(24.dp)
         )
     }
@@ -518,31 +560,33 @@ private fun GuidanceTabContent(data: MoonPhaseResponse) {
 private fun ForecastTabContent(data: MoonPhaseResponse) {
     data.nextPhases?.let { next ->
         Card(
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF171822)),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             shape = RoundedCornerShape(24.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(modifier = Modifier.padding(24.dp)) {
                 Text(
-                    text = "Upcoming Lunar Phases",
+                    text = stringResource(R.string.forecast_title),
+                    style = MaterialTheme.typography.titleLarge,
                     fontSize = 26.sp,
                     fontWeight = FontWeight.ExtraBold,
                     fontFamily = BubblyFontFamily,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
-                next.newMoon?.let { InfoRow("Next New Moon", it) }
-                next.firstQuarter?.let { InfoRow("First Quarter", it) }
-                next.fullMoon?.let { InfoRow("Next Full Moon", it) }
-                next.lastQuarter?.let { InfoRow("Last Quarter", it) }
+                next.newMoon?.let { InfoRow(stringResource(R.string.forecast_next_new_moon), it) }
+                next.firstQuarter?.let { InfoRow(stringResource(R.string.forecast_first_quarter), it) }
+                next.fullMoon?.let { InfoRow(stringResource(R.string.forecast_next_full_moon), it) }
+                next.lastQuarter?.let { InfoRow(stringResource(R.string.forecast_last_quarter), it) }
             }
         }
     } ?: run {
         Text(
-            text = "No forecast data available for this date.",
+            text = stringResource(R.string.forecast_no_data),
+            style = MaterialTheme.typography.bodyLarge,
             fontSize = 18.sp,
             fontFamily = BubblyFontFamily,
-            color = Color(0xFFA0A5C0),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(24.dp)
         )
     }
@@ -556,7 +600,20 @@ private fun InfoRow(label: String, value: String) {
             .padding(vertical = 6.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = label, fontSize = 20.sp, fontFamily = BubblyFontFamily, color = Color(0xFFA0A5C0))
-        Text(text = value, fontSize = 20.sp, fontFamily = BubblyFontFamily, fontWeight = FontWeight.Bold, color = Color.White)
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+            fontSize = 20.sp,
+            fontFamily = BubblyFontFamily,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyLarge,
+            fontSize = 20.sp,
+            fontFamily = BubblyFontFamily,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }

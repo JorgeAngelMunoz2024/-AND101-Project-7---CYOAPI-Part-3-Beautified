@@ -1,12 +1,12 @@
-# AND101 Project 6 - CYOAPI Part 2: RecyclerView Edition
+# AND101 Project 7 - CYOAPI Part 3: Beautified
 
 Submitted by: **Jorge Muñoz**
 
-Time spent: **7** hours spent in total
+Time spent: **3** hours spent in total
 
 ## Summary
 
-**MoonDay** is an android app that **queries the FreeAstroAPI for any selected date in the year, displays a horizontal RecyclerView of the weekly moon phases, and shows interactive tabs for lunar visuals, astronomical metrics, tropical zodiac signs, spiritual guidance, and upcoming phase forecasts.**
+**MoonDay** is an android app that **queries the FreeAstroAPI for any selected date in the year, displays a horizontal RecyclerView of the weekly moon phases, and showcases customized cosmic themes, styles, multiple downloadable typography fonts, and dark mode adaptive drawables across interactive tabs.**
 
 If I had to describe this project in three (3) emojis, they would be: **🌕 🔮 ✨**
 
@@ -14,36 +14,33 @@ If I had to describe this project in three (3) emojis, they would be: **🌕 �
 
 The following REQUIRED features are completed:
 
-- [x] Make an API call to an API of your choice using AsyncHTTPClient
-- [x] Implement a RecyclerView to display a list of entries from the API
-- [x] Display at least three (3) pieces of data for each RecyclerView item (1. Formatted Date, 2. Moon Phase SVG, 3. Phase Name & Illumination %)
+- [x] App contains a RecyclerView that displays a list of scrollable data
+- [x] App displays at least two (2) pieces of data for each RecyclerView item (1. Formatted Date, 2. Moon Phase SVG, 3. Phase Name &amp; Illumination %)
+- [x] Use a downloadable font with custom color and size (Google Fonts Cinzel &amp; Fredoka typography)
+- [x] Modify the theme of the app in `themes.xml` (Cosmic Day &amp; Night mode theme palette, window background, status bar)
+- [x] Define and apply at least one style in **either** `themes.xml` or a new file `styles.xml` (`Widget.MoonDay.TitleText`, `Widget.MoonDay.SubtitleText`, `Widget.MoonDay.Card`, `Widget.MoonDay.CardSelected`, `Widget.MoonDay.Button`)
 
 The following STRETCH features are implemented:
 
-- [x] Add a UI element for the user to interact with API further (Material 3 DatePicker Calendar)
-- [ ] Show a `Toast` or `Snackbar` when an item is clicked
-- [ ] Add item dividers with `DividerItemDecoration`
+- [x] Update the night theme to use different versions of styles when in dark mode (Adaptive `themes.xml` &amp; `values-night/styles.xml` color schemes and card borders)
+- [x] Use different drawables when in dark mode (Night mode adaptive vector drawables and card shape drawables in `res/drawable-night/`)
 
 The following EXTRA features are implemented:
 
-- [x] **Horizontal Weekly RecyclerView**: Sliding list showing moon phases for the week of the chosen date with infinite looping and smooth page synchronization.
-- [x] **Zero Rate Limiting & Offline Astronomical Engine**: Seamless local calculation fallback so rate limits (`429`) or quota exhaustion never break the app.
-- [x] **Top-Left Back Navigation**: Functional Back Arrow button in the top left corner of the header.
 - [x] **Cosmic Starry Header**: Custom starry night background banner with shimmering star particles.
-- [x] **Bubbly Fredoka Typography**: Enlarged Google Fredoka font for titles, cards, and buttons.
-- [x] **Tabbed Data Navigation Bar**: Organized the rich API data into 4 clean tabs (`Phase`, `Astronomy`, `Guidance`, `Forecast`).
+- [x] **Multi-Font Aesthetic Typography**: Downloadable `Cinzel` font for titles paired with `Fredoka` for cards and badges.
 
 ## Video Demo
 
 Here's a video / GIF that demos all of the app's implemented features:
 
-![Video Demo](Peek%202026-10-25%2002-24.gif)
+![Video Demo](Peek%202026-11-18%2011-13.gif)
 
 GIF created with **Peek**
 
 ## Notes
 
-During the creation of this app, I learned how to implement a horizontal RecyclerView with custom ViewHolders using AsyncHTTPClient, load SVG byte arrays dynamically into Compose & RecyclerView items, prevent API rate limiting with local astronomical calculations, configure top-left back navigation, and design cosmic starry headers.
+During the creation of this app, I learned how to integrate Google Fonts downloadable font providers in XML, configure adaptive Day/Night themes in `themes.xml`, define custom component styles in `styles.xml`, and create dark-mode specific drawables in `res/drawable-night/`.
 
 ## License
 

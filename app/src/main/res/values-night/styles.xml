@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base Widget Style for MoonDay -->
+    <style name="Widget.MoonDay" parent="" />
+
+    <!-- Custom Text Styles (Dark Night Mode Overrides) -->
+    <style name="Widget.MoonDay.TitleText" parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/cosmic_text_primary</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/fredoka</item>
+    </style>
+
+    <style name="Widget.MoonDay.SubtitleText" parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/cosmic_text_secondary</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">@font/fredoka</item>
+    </style>
+
+    <style name="Widget.MoonDay.DateBadge" parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/cosmic_secondary</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/fredoka</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <!-- Custom Component Styles (Dark Night Mode Overrides) -->
+    <style name="Widget.MoonDay.Card" parent="Widget.MoonDay">
+        <item name="android:background">@drawable/bg_cosmic_card</item>
+        <item name="android:padding">16dp</item>
+    </style>
+
+    <style name="Widget.MoonDay.CardSelected" parent="Widget.MoonDay.Card">
+        <item name="android:background">@drawable/bg_selected_card</item>
+    </style>
+
+    <style name="Widget.MoonDay.Button" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/cosmic_primary</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:fontFamily">@font/fredoka</item>
+        <item name="cornerRadius">20dp</item>
+    </style>
+</resources>
